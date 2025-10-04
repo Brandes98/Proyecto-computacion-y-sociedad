@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar Sesión - Publicloud</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="auth-body">
+  <div class="auth-container">
+    <h2>Iniciar Sesión</h2>
+    <form method="get" action="dashboard.html">
+      <label for="email">Correo electrónico</label>
+      <input type="email" id="email" placeholder="Ingresa tu correo" required>
+
+      <label for="password">Contraseña</label>
+      <input type="password" id="password" placeholder="Ingresa tu contraseña" required>
+
+      <button type="submit" class="btn btn--primary" action="dashboard.html">Entrar</button>
+    </form>
+    <p class="auth-alt">
+      ¿No tienes cuenta? <a href="register.html">Regístrate aquí</a>
+    </p>
+  </div>
+</body>
+</html>
