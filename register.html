@@ -5,11 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registro - Publicloud</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="js/auth.js" defer></script>
 </head>
 <body class="auth-body">
   <div class="auth-container">
-    <h2>Crear Cuenta</h2>
-    <form>
+    <div class="auth-header">
+      <a href="index.html" class="back-link">← Volver al inicio</a>
+      <h2>Crear Cuenta</h2>
+    </div>
+    <form id="registerForm">
       <label for="name">Nombre completo</label>
       <input type="text" id="name" placeholder="Tu nombre" required>
 

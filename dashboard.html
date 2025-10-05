@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="js/auth.js" defer></script>
+  <script src="js/dashboard.js" defer></script>
 </head>
 <body class="dash-body">
 
@@ -16,11 +18,10 @@
     <a href="index.html" class="logo-mini" aria-label="Inicio">◇</a>
     <nav class="side-nav">
       <a class="side-link active" href="#" title="Inicio">🏠</a>
-      <a class="side-link" href="#" title="Mis diseños">🗂</a>
       <a class="side-link" href="#" title="Mensajes">💬</a>
       <a class="side-fab" title="Nuevo" href="upload.html">＋</a>
       <a class="side-link" href="#" title="Ajustes">⚙️</a>
-      <a class="side-link" href="login.html" title="Salir">👤</a>
+      <a class="side-link logout-btn" href="#" title="Salir">➜]</a>
     </nav>
   </aside>
 
@@ -35,7 +36,7 @@
       <!-- Tarjeta de perfil -->
       <article class="profile-card">
         <div class="profile-curve"></div>
-        <img class="avatar-xl" src="img/avatars/camila.jpg" alt="Camila Cabello" />
+        <img class="avatar-xl" src="img/avatar-camila.avif" alt="Camila Cabello" />
         <h2 class="profile-name">Camila Cabello</h2>
         <p class="profile-role">Interior designer</p>
         <p class="profile-loc">📍 San José, CR</p>
@@ -54,41 +55,33 @@
 
       <!-- Pestañas y grid -->
       <section class="panel">
-        <!-- Tabs sin JS -->
         <div class="tabs">
-          <input type="radio" name="tabs" id="tab-photos" checked>
-          <input type="radio" name="tabs" id="tab-likes">
+          <input type="radio" name="tabs" id="tab-designs" checked>
+          <input type="radio" name="tabs" id="tab-stats">
           <div class="tabs-bar">
-            <label for="tab-photos">Photos</label>
-            <label for="tab-likes">Likes</label>
+            <label for="tab-designs">Mis Diseños</label>
+            <label for="tab-stats">Estadísticas</label>
           </div>
 
           <div class="tab-content">
-            <!-- PHOTOS -->
             <div class="tab-pane">
-              <div class="photo-grid">
-                <img src="img/rooms/1.jpg" alt="">
-                <img src="img/rooms/2.jpg" alt="">
-                <img src="img/rooms/3.jpg" alt="">
-                <img src="img/rooms/4.jpg" alt="">
-                <img src="img/rooms/5.jpg" alt="">
-                <img src="img/rooms/6.jpg" alt="">
-                <img src="img/rooms/7.jpg" alt="">
-                <img src="img/rooms/8.jpg" alt="">
-              </div>
+              <div class="design-grid"></div>
             </div>
 
-            <!-- LIKES -->
             <div class="tab-pane">
-              <div class="photo-grid">
-                <img src="img/likes/1.jpg" alt="">
-                <img src="img/likes/2.jpg" alt="">
-                <img src="img/likes/3.jpg" alt="">
-                <img src="img/likes/4.jpg" alt="">
-                <img src="img/likes/5.jpg" alt="">
-                <img src="img/likes/6.jpg" alt="">
-                <img src="img/likes/7.jpg" alt="">
-                <img src="img/likes/8.jpg" alt="">
+              <div class="stats-panel">
+                <div class="stat-card">
+                  <h3>Diseños subidos</h3>
+                  <span class="designs-count">0</span>
+                </div>
+                <div class="stat-card">
+                  <h3>Total de likes</h3>
+                  <span class="total-likes">0</span>
+                </div>
+                <div class="stat-card">
+                  <h3>Miembro desde</h3>
+                  <span class="join-date">Hoy</span>
+                </div>
               </div>
             </div>
           </div>
