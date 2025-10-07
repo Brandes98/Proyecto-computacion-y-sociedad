@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="js/main.js" defer></script>
+  <script src="js/gallery.js" defer></script>
 </head>
 <body>
   <!-- Header -->
@@ -56,70 +57,7 @@
       </p>
 
       <div class="grid">
-        <!-- Card -->
-        <article class="card">
-          <img class="card__img" src="img/obras/1.jpg" alt="Bosque mágico" />
-          <div class="card__meta">
-            <div class="user"><img src="img/avatars/1.jpg" alt=""><span>Dianne Russell</span></div>
-            <div class="stats"><span>❤ 850</span><span>👁 4902</span></div>
-          </div>
-        </article>
-
-        <article class="card">
-          <img class="card__img" src="img/obras/2.jpg" alt="Cubismo" />
-          <div class="card__meta">
-            <div class="user"><img src="img/avatars/2.jpg" alt=""><span>Arlene McCoy</span></div>
-            <div class="stats"><span>❤ 583</span><span>👁 4023</span></div>
-          </div>
-        </article>
-
-        <article class="card">
-          <img class="card__img" src="img/obras/3.jpg" alt="Esfera cósmica" />
-          <div class="card__meta">
-            <div class="user"><img src="img/avatars/3.jpg" alt=""><span>Kathryn Murphy</span></div>
-            <div class="stats"><span>❤ 103</span><span>👁 7293</span></div>
-          </div>
-        </article>
-
-        <article class="card">
-          <img class="card__img" src="img/obras/4.jpg" alt="Nebulosa" />
-          <div class="card__meta">
-            <div class="user"><img src="img/avatars/4.jpg" alt=""><span>Guy Hawkins</span></div>
-            <div class="stats"><span>❤ 483</span><span>👁 2813</span></div>
-          </div>
-        </article>
-
-        <article class="card">
-          <img class="card__img" src="img/obras/5.jpg" alt="Arrecife" />
-          <div class="card__meta">
-            <div class="user"><img src="img/avatars/5.jpg" alt=""><span>Eleanor Pena</span></div>
-            <div class="stats"><span>❤ 493</span><span>👁 4923</span></div>
-          </div>
-        </article>
-
-        <article class="card">
-          <img class="card__img" src="img/obras/6.jpg" alt="Oleaje" />
-          <div class="card__meta">
-            <div class="user"><img src="img/avatars/6.jpg" alt=""><span>Cody Fisher</span></div>
-            <div class="stats"><span>❤ 501</span><span>👁 1249</span></div>
-          </div>
-        </article>
-
-        <article class="card">
-          <img class="card__img" src="img/obras/7.jpg" alt="Planeta" />
-          <div class="card__meta">
-            <div class="user"><img src="img/avatars/7.jpg" alt=""><span>Savannah Nguyen</span></div>
-            <div class="stats"><span>❤ 482</span><span>👁 4713</span></div>
-          </div>
-        </article>
-
-        <article class="card">
-          <img class="card__img" src="img/obras/8.jpg" alt="Rostros" />
-          <div class="card__meta">
-            <div class="user"><img src="img/avatars/8.jpg" alt=""><span>Brooklyn Simmons</span></div>
-            <div class="stats"><span>❤ 392</span><span>👁 2834</span></div>
-          </div>
-        </article>
+        <!-- Las tarjetas se cargarán dinámicamente desde gallery.js -->
       </div>
 
       <div class="cta-row">
@@ -132,46 +70,7 @@
   <!-- Artistas -->
   <section id="artistas" class="section section--soft">
     <div class="container">
-      <h2 class="section__title">ARTISTAS</h2>
-
-      <article class="artist">
-        <img class="artist__avatar" src="img/artist/luna.jpg" alt="Luna Evergreen" />
-        <div class="artist__info">
-          <h3>Luna Evergreen</h3>
-          <p>
-            Luna Evergreen es una artista digital visionaria renombrada por sus creaciones etéreas y encantadoras...
-          </p>
-          <div class="artist__links">
-            <a href="#" aria-label="Sitio web">🌐</a>
-            <a href="#" aria-label="Instagram">📷</a>
-            <a href="#" aria-label="X">✕</a>
-          </div>
-        </div>
-      </article>
-
-      <div class="artist__works">
-        <figure class="work">
-          <img src="img/artist/obra1.jpg" alt="Sinfonía celestial" />
-          <figcaption>
-            <h4>Sinfonía celestial</h4>
-            <p>Explora el cosmos a través de los paisajes celestiales de Luna...</p>
-          </figcaption>
-        </figure>
-
-        <figure class="work">
-          <img src="img/artist/obra2.jpg" alt="Criaturas mágicas" />
-          <figcaption>
-            <h4>Criaturas mágicas</h4>
-            <p>Encuentra seres míticos y criaturas fantásticas en los imaginativos diseños de Luna...</p>
-          </figcaption>
-        </figure>
-      </div>
-
-      <div class="dots" aria-label="paginación">
-        <span class="dot dot--active"></span>
-        <span class="dot"></span>
-        <span class="dot"></span>
-      </div>
+      <!-- El contenido se cargará dinámicamente desde gallery.js -->
     </div>
   </section>
 
@@ -190,35 +89,7 @@
       <h2 class="section__title">TESTIMONIOS</h2>
 
       <div class="testimonials">
-        <article class="testimonial">
-          <img src="img/test/1.jpg" alt="Jackson Chen" />
-          <div>
-            <h4>Jackson Chen</h4>
-            <p>
-              He sido miembro de Publicloud durante más de un año...
-            </p>
-          </div>
-        </article>
-
-        <article class="testimonial">
-          <img src="img/test/2.jpg" alt="Sophia Lee" />
-          <div>
-            <h4>Sophia Lee</h4>
-            <p>
-              Publicloud ha sido un recurso invaluable para mí como artista digital...
-            </p>
-          </div>
-        </article>
-
-        <article class="testimonial">
-          <img src="img/test/3.jpg" alt="Alex Kim" />
-          <div>
-            <h4>Alex Kim</h4>
-            <p>
-              La comunidad me ha impulsado a crear y compartir con confianza…
-            </p>
-          </div>
-        </article>
+        <!-- Los testimonios se cargarán dinámicamente desde gallery.js -->
       </div>
     </div>
   </section>
@@ -229,11 +100,7 @@
       <h2 class="section__title">CONFIADO POR</h2>
       <p class="section__subtitle">Reconocido por líderes y creativos del arte digital.</p>
       <div class="logos">
-        <img src="img/logos/1.svg" alt="Logo 1">
-        <img src="img/logos/2.svg" alt="Logo 2">
-        <img src="img/logos/3.svg" alt="Logo 3">
-        <img src="img/logos/4.svg" alt="Logo 4">
-        <img src="img/logos/5.svg" alt="Logo 5">
+        <!-- Los logos se cargarán dinámicamente desde gallery.js -->
       </div>
     </div>
   </section>
@@ -241,33 +108,7 @@
   <!-- Footer -->
   <footer class="footer">
     <div class="container footer__grid">
-      <div class="footer__brand">
-        <img src="img/logo.svg" alt="Publicloud">
-        <p>Publicloud</p>
-      </div>
-
-      <div class="footer__col">
-        <h5>Extras</h5>
-        <a href="#">Consejos</a>
-        <a href="#">Recursos</a>
-        <a href="#">Compartir tu arte</a>
-      </div>
-
-      <div class="footer__col">
-        <h5>Nosotros</h5>
-        <a href="#">Publicloud</a>
-        <a href="#">Privacidad</a>
-        <a href="#">Términos y condiciones</a>
-        <a href="#">Preguntas frecuentes</a>
-      </div>
-
-      <div class="footer__col">
-        <h5>Redes Sociales</h5>
-        <a href="#">Twitter</a>
-        <a href="#">Instagram</a>
-        <a href="#">Facebook</a>
-        <a href="#">YouTube</a>
-      </div>
+      <!-- El footer se cargará dinámicamente desde gallery.js -->
     </div>
   </footer>
 </body>

@@ -46,7 +46,7 @@ img{display:block;max-width:100%;height:auto;border-radius:16px}
   background:#dff3f8;border:2px solid var(--primary-2);
   padding:8px 12px;border-radius:999px;text-decoration:none;color:var(--ink)
 }
-.profile__avatar{width:28px;height:28px;border-radius:999px}
+.profile__avatar{width:28px;height:28px;border-radius:999px;object-fit:cover}
 
 /* Hero */
 .hero{
@@ -94,8 +94,10 @@ img{display:block;max-width:100%;height:auto;border-radius:16px}
 
 .card{
   background:var(--card);border-radius:var(--radius);
-  box-shadow:var(--shadow);overflow:hidden
+  box-shadow:var(--shadow);overflow:hidden;
+  transition:.3s ease;cursor:pointer
 }
+.card:hover{transform:translateY(-4px);box-shadow:0 8px 25px rgba(15,58,70,.15)}
 .card__img{border-bottom-left-radius:0;border-bottom-right-radius:0}
 .card__meta{
   display:flex;align-items:center;justify-content:space-between;
@@ -112,7 +114,7 @@ img{display:block;max-width:100%;height:auto;border-radius:16px}
   display:grid;grid-template-columns:96px 1fr;gap:16px;
   background:#e9f4f6;border:1px solid #d2e8ee;border-radius:18px;padding:16px 18px;margin-bottom:18px
 }
-.artist__avatar{width:96px;height:96px;border-radius:14px}
+.artist__avatar{width:96px;height:96px;border-radius:14px;object-fit:cover}
 .artist__links a{margin-right:8px;text-decoration:none}
 
 .artist__works{
@@ -536,6 +538,23 @@ img{display:block;max-width:100%;height:auto;border-radius:16px}
 }
 .stat-card h3{margin:0 0 8px;color:var(--muted);font-size:14px;font-weight:500}
 .stat-card span{font-size:24px;font-weight:700;color:var(--primary)}
+
+.like-btn{
+  cursor:pointer;
+  transition:.2s ease;
+  user-select:none;
+}
+.like-btn:hover{
+  transform:scale(1.1);
+  filter:brightness(1.2);
+}
+
+.card img{
+  transition:.3s ease;
+}
+.card:hover img{
+  transform:scale(1.05);
+}
 
 .notification-container{
   position:fixed;

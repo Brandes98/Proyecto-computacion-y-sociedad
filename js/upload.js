@@ -94,11 +94,24 @@ class UploadManager {
             authorName: currentUser.name,
             uploadDate: new Date().toISOString(),
             likes: 0,
-            fileName: fileInput.files[0].name
+            fileName: fileInput.files[0].name,
+            image: `img/obras/user-${Date.now()}.jpg`,
+            author: {
+                name: currentUser.name,
+                avatar: "img/avatar-camila.avif"
+            },
+            stats: {
+                likes: 0,
+                views: 0
+            }
         };
 
         this.designs.push(newDesign);
         localStorage.setItem('publicloud_designs', JSON.stringify(this.designs));
+        
+        const publicDesigns = JSON.parse(localStorage.getItem('publicloud_public_designs')) || [];
+        publicDesigns.unshift(newDesign);
+        localStorage.setItem('publicloud_public_designs', JSON.stringify(publicDesigns));
         
         this.showMessage('Diseño subido exitosamente', 'success');
         setTimeout(() => {
