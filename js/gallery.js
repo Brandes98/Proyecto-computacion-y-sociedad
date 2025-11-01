@@ -80,6 +80,15 @@ class GalleryManager {
   
 
   /* === RENDER === */
+  getInitials(name) {
+    if (!name) return 'U';
+    const words = name.split(' ');
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    return name.charAt(0).toUpperCase();
+  }
+
   renderGallery(designs = this.designs, limitCount = 8) {
     const gridContainer = document.querySelector(".grid");
     if (!gridContainer) return;
@@ -93,7 +102,9 @@ class GalleryManager {
           <img class="card__img" src="${design.fileURL || design.image}" alt="${design.title}" loading="lazy" />
           <div class="card__meta">
             <div class="user">
-              <img src="${design.authorPhotoURL}" alt="${design.authorDisplayName}" loading="lazy">
+              <img src="${design.authorPhotoURL}" alt="${design.authorDisplayName}" loading="lazy" 
+                   onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="avatar-placeholder" style="display:none; width:28px; height:28px; border-radius:50%; font-size:10px;">${this.getInitials(design.authorDisplayName)}</div>
               <span>${design.authorDisplayName}</span>
             </div>
             <div class="stats">
@@ -105,7 +116,19 @@ class GalleryManager {
       `
       )
       .join("");
+      
       this.markUserLikes();
+      
+      // Manejar visibilidad del botón "Ver más"
+      this.updateVerMasButtonVisibility(limitCount, designs.length);
+  }
+
+  updateVerMasButtonVisibility(currentShowing, totalAvailable) {
+    if (currentShowing >= totalAvailable) {
+      this.hideVerMasButton();
+    } else {
+      this.showVerMasButton();
+    }
   }
 
   /* === OTRAS SECCIONES === */
@@ -167,7 +190,9 @@ class GalleryManager {
           .map(
             (artist) => `
             <article class="artist">
-              <img class="artist__avatar" src="${artist.photoURL || "img/avatar-default.png"}" alt="${artist.name}" />
+              <img class="artist__avatar" src="${artist.photoURL}" alt="${artist.name}" 
+                   onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+              <div class="avatar-placeholder" style="display:none; width:64px; height:64px; border-radius:50%; font-size:20px;">${this.getInitials(artist.name)}</div>
               <div class="artist__info">
                 <h3>${artist.name}</h3>
                 <p>${artist.bio || "Este artista aún no ha agregado una descripción."}</p>
@@ -220,7 +245,9 @@ class GalleryManager {
       .map(
         (t) => `
         <article class="testimonial">
-          <img src="${t.photoURL || 'img/avatar-default.png'}" alt="${t.authorName}" />
+          <img src="${t.photoURL || 'img/avatar-default.png'}" alt="${t.authorName}" 
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+          <div class="avatar-placeholder" style="display:none; width:50px; height:50px; border-radius:50%; font-size:16px;">${this.getInitials(t.authorName)}</div>
           <div>
             <h4>${t.authorName}</h4>
             <p>${t.text}</p>
@@ -367,9 +394,11 @@ class GalleryManager {
 
     // --- Clic en "Ver más" ---
     const verMasBtn = document.querySelector(".cta-row .btn--primary");
-    if (verMasBtn) {
+    if (verMasBtn && !verMasBtn.hasAttribute('data-listener-attached')) {
+      verMasBtn.setAttribute('data-listener-attached', 'true');
       verMasBtn.addEventListener("click", (e) => {
         e.preventDefault();
+        e.stopPropagation();
         this.loadMoreDesigns();
       });
     }
@@ -457,7 +486,39 @@ class GalleryManager {
 
   loadMoreDesigns() {
     const current = document.querySelectorAll(".card").length;
-    this.renderGallery(this.designs, current + 4);
+    const total = this.designs.length;
+    
+    // Si ya se están mostrando todos los diseños, no hacer nada
+    if (current >= total) {
+      this.hideVerMasButton();
+      return;
+    }
+    
+    // Mostrar 4 diseños más o todos los restantes
+    const newLimit = Math.min(current + 4, total);
+    this.renderGallery(this.designs, newLimit);
+    
+    // Asegurarse de marcar los likes del usuario después de renderizar más diseños
+    this.markUserLikes();
+    
+    // Si ya se muestran todos los diseños, ocultar el botón
+    if (newLimit >= total) {
+      this.hideVerMasButton();
+    }
+  }
+
+  hideVerMasButton() {
+    const verMasBtn = document.querySelector(".cta-row .btn--primary");
+    if (verMasBtn) {
+      verMasBtn.style.display = 'none';
+    }
+  }
+
+  showVerMasButton() {
+    const verMasBtn = document.querySelector(".cta-row .btn--primary");
+    if (verMasBtn) {
+      verMasBtn.style.display = 'inline-block';
+    }
   }
 
   /* === DATOS MOCK (aún no en Firebase) === */
