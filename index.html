@@ -8,8 +8,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="js/main.js" defer></script>
-  <script src="js/gallery.js" defer></script>
+  <script src="firebase-env.js"></script>
+  <script type="module" src="js/firebase/config.js"></script>
+  <script type="module" src="js/main.js"></script>
+  <script type="module" src="js/gallery.js" defer></script>
+
 </head>
 <body>
   <!-- Header -->
@@ -62,7 +65,7 @@
 
       <div class="cta-row">
         <a class="btn btn--primary" href="#">Ver más</a>
-        <a class="btn btn--ghost" href="#">Subir diseño</a>
+        <a class="btn btn--ghost" href="upload.html">Subir diseño</a>
       </div>
     </div>
   </section>
@@ -90,6 +93,9 @@
 
       <div class="testimonials">
         <!-- Los testimonios se cargarán dinámicamente desde gallery.js -->
+      </div>
+      <div class="testimonials-actions">
+        <button class="btn btn--primary add-testimonial-btn">Agregar testimonio</button>
       </div>
     </div>
   </section>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detalle del diseño — Publicloud</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="firebase-env.js"></script>
+  <script type="module" src="js/firebase/config.js"></script>
+  <script type="module" src="js/design.js"></script>
+</head>
+<body class="dash-body">
+  <main class="design-page container">
+      <!-- Sidebar -->
+  <aside class="sidebar">
+    <a href="index.html" class="side-link" aria-label="Inicio">◇</a>
+    <nav class="side-nav">
+      <a class="side-link" href="profile.html" title="Perfil">👤</a>
+      <a class="side-link" href="#" title="Mensajes">💬</a>
+      <a class="side-link" title="Nuevo" href="upload.html">➕</a>
+      <a class="side-link" href="#" title="Ajustes">⚙️</a>
+      <a class="side-link logout-btn" href="#" title="Salir">➜]</a>
+    </nav>
+  </aside>
+    <div class="design-detail">
+      <section class="artist-profile">
+        <img id="artistAvatar" class="artist-avatar" src="img/avatar-default.png" alt="Autor" />
+        <h2 id="artistName">Autor</h2>
+        <p id="artistRole">Digital Artist</p>
+        <p id="artistLocation">📍 Ciudad, País</p>
+
+        <div class="artist-stats">
+          <div><span id="followersCount">0</span><span>followers</span></div>
+          <div><span id="followingCount">0</span><span>following</span></div>
+          <div><span id="likesCount">0</span><span>likes</span></div>
+        </div>
+
+        <div class="artist-actions">
+          <button class="btn btn--ghost" id="contactBtn">Contact</button>
+          <button class="btn btn--primary" id="followBtn">Follow</button>
+          <button class="btn btn--secondary" id="likeArtistBtn">Like Artist</button>
+        </div>
+      </section>
+
+      <section class="design-content">
+        <h1 id="designTitle">Título del diseño</h1>
+        <p id="designDescription">Descripción del diseño...</p>
+        <div class="design-actions-bar">
+          <button class="btn btn--primary" id="downloadBtn">Descargar</button>
+          <div class="design-metrics">
+            <button id="likeBtn" class="like-btn">❤</button>
+            <span id="likesNum">0</span>
+            <span>👁 <span id="viewsNum">0</span></span>
+          </div>
+        </div>
+
+        <div class="design-images">
+          <img id="designImage" src="img/placeholder.png" alt="Diseño" />
+        </div>
+
+        <div class="related-works">
+          <h2>Más de este artista</h2>
+          <div class="related-grid" id="relatedGrid"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

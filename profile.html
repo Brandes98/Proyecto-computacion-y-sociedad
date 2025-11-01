@@ -9,8 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="firebase-env.js"></script>
-  <script  type="module" src="js/firebase/config.js" defer></script>
-  <script  type="module" src="js/auth.js" defer></script>
+  <script type="module" src="js/firebase/config.js"></script>
+  <script type="module" src="js/firebase/auth.js"></script>
   <script type="module" src="js/profile.js"></script>
   <script type="module" src="js/editProfile.js"></script>
 </head>
@@ -18,11 +18,11 @@
 
   <!-- Sidebar -->
   <aside class="sidebar">
-    <a href="index.html" class="logo-mini" aria-label="Inicio">◇</a>
+    <a href="index.html" class="side-link" aria-label="Inicio">◇</a>
     <nav class="side-nav">
-      <a class="side-link active" href="#" title="Inicio">👤</a>
+      <a class="side-link active" href="profile.html" title="Perfil">👤</a>
       <a class="side-link" href="#" title="Mensajes">💬</a>
-      <a class="side-fab" title="Nuevo" href="upload.html">＋</a>
+      <a class="side-link" title="Nuevo" href="upload.html">➕</a>
       <a class="side-link" href="#" title="Ajustes">⚙️</a>
       <a class="side-link logout-btn" href="#" title="Salir">➜]</a>
     </nav>
@@ -39,10 +39,10 @@
       <!-- Tarjeta de perfil -->
       <article class="profile-card">
         <div class="profile-curve"></div>
-        <img class="avatar-xl" src="img/avatar-camila.avif" alt="Camila Cabello" />
-        <h2 class="profile-name">Camila Cabello</h2>
-        <p class="profile-role">Interior designer</p>
-        <p class="profile-loc">📍 San José, CR</p>
+        <img class="avatar-xl" src="" alt="" />
+        <h2 class="profile-name"></h2>
+        <p class="profile-role"></p>
+        <p class="profile-loc"></p>
 
         <div class="stats-3">
           <div>
@@ -60,8 +60,8 @@
         </div>
 
         <div class="profile-actions">
-          <a class="btn btn--ghost" href="#">Edit profile</a>
-          <a class="btn btn--primary" href="#">Add friends</a>
+          <a class="btn btn--ghost" href="#">Editar</a>
+          <a class="btn btn--primary" href="#">Notificaciones</a>
         </div>
       </article>
 
@@ -131,6 +131,37 @@
       </form>
     </div>
   </div>
+
+  <!-- Modal para editar diseño -->
+  <div id="editDesignModal" class="modal">
+    <div class="modal-content">
+      <h2>Editar diseño</h2>
+      <form id="editDesignForm">
+        <label for="editTitle">Título</label>
+        <input type="text" id="editTitle" required>
+
+        <label for="editDescription">Descripción</label>
+        <textarea id="editDescription" rows="3" required></textarea>
+
+        <label for="editCategory">Categoría</label>
+        <select id="editCategory" required>
+          <option value="ilustracion">Ilustración</option>
+          <option value="diseno-grafico">Diseño Gráfico</option>
+          <option value="fotografia">Fotografía</option>
+          <option value="arte-digital">Arte Digital</option>
+          <option value="diseno-web">Diseño Web</option>
+          <option value="otros">Otros</option>
+        </select>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn btn--primary">Guardar cambios</button>
+          <button type="button" id="cancelDesignEdit" class="btn btn--ghost">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  
 
 </body>
 </html>

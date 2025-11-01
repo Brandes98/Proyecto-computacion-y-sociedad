@@ -1,615 +1,553 @@
+// js/gallery.js
+import { db, auth } from "./firebase/config.js";
+import { onUserStateChange } from "./firebase/auth.js";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  orderBy,
+  limit,
+  addDoc,
+  serverTimestamp,
+  doc,
+  getDoc,
+  setDoc,
+  deleteDoc,
+  updateDoc,
+  increment,
+
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
 class GalleryManager {
-    constructor() {
-        this.mockDesigns = this.generateMockData();
-        this.userDesigns = JSON.parse(localStorage.getItem('publicloud_public_designs')) || [];
-        this.designs = [...this.userDesigns, ...this.mockDesigns];
-        this.init();
+  constructor() {
+    this.designs = [];
+    this.mockDesigns = this.generateMockData(); // datos de respaldo
+    this.currentUser = null;
+    this.init();
+  }
+
+  init() {
+    onUserStateChange(async (user) => {
+      this.currentUser = user || null;
+      await this.loadDesignsFromFirebase();
+      this.initSections();
+      this.attachEventListeners();
+    });
+  }
+
+  async loadDesignsFromFirebase() {
+    try {
+      // 1️⃣ Obtener todos los diseños
+      const q = query(collection(db, "designs"), orderBy("createdAt", "desc"));
+      const snapshot = await getDocs(q);
+
+      const allDesigns = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      // 2️⃣ Filtrar diseños que no pertenezcan al usuario actual
+      const filteredDesigns = this.currentUser
+        ? allDesigns.filter((d) => d.authorId !== this.currentUser.uid)
+        : allDesigns;
+
+      // 3️⃣ Obtener la colección de usuarios 
+      const usersSnapshot = await getDocs(collection(db, "users"));
+      const usersMap = {};
+      usersSnapshot.forEach((u) => {
+        usersMap[u.id] = u.data();
+      });
+
+      // 4️⃣ Enriquecer cada diseño con photoURL y autor
+      const enrichedDesigns = filteredDesigns.map((d) => ({
+        ...d,
+        authorPhotoURL: usersMap[d.authorId]?.photoURL || "img/avatar-default.png",
+        authorDisplayName: usersMap[d.authorId]?.name || d.authorName || "Usuario desconocido",
+      }));
+
+      // 5️⃣ Guardar y renderizar
+      this.designs = enrichedDesigns.length > 0 ? enrichedDesigns : this.mockDesigns;
+      this.renderGallery();
+    } catch (error) {
+      console.error("Error al cargar diseños:", error);
+      this.designs = this.mockDesigns;
+      this.renderGallery();
     }
+  }
+  
 
-    generateMockData() {
-        return [
-            {
-                id: 1,
-                title: "Bosque mágico",
-                image: "img/Rectangle 4.png",
-                author: {
-                    name: "Dianne Russell",
-                    avatar: "img/profile_img/photo.png"
-                },
-                stats: {
-                    likes: 850,
-                    views: 4902
-                },
-                category: "ilustracion"
-            },
-            {
-                id: 2,
-                title: "Cubismo",
-                image: "img/Rectangle 4-1.png",
-                author: {
-                    name: "Arlene McCoy",
-                    avatar: "img/profile_img/photo-1.png"
-                },
-                stats: {
-                    likes: 583,
-                    views: 4023
-                },
-                category: "arte-digital"
-            },
-            {
-                id: 3,
-                title: "Esfera cósmica",
-                image: "img/Rectangle 4-2.png",
-                author: {
-                    name: "Kathryn Murphy",
-                    avatar: "img/profile_img/photo-2.png"
-                },
-                stats: {
-                    likes: 103,
-                    views: 7293
-                },
-                category: "arte-digital"
-            },
-            {
-                id: 4,
-                title: "Nebulosa",
-                image: "img/Rectangle 4-3.png",
-                author: {
-                    name: "Guy Hawkins",
-                    avatar: "img/profile_img/Rectangle 18.png"
-                },
-                stats: {
-                    likes: 483,
-                    views: 2813
-                },
-                category: "fotografia"
-            },
-            {
-                id: 5,
-                title: "Arrecife",
-                image: "img/Rectangle 4-4.png",
-                author: {
-                    name: "Eleanor Pena",
-                    avatar: "img/profile_img/Rectangle 18-1.png"
-                },
-                stats: {
-                    likes: 493,
-                    views: 4923
-                },
-                category: "ilustracion"
-            },
-            {
-                id: 6,
-                title: "Oleaje",
-                image: "img/Rectangle 4-5.png",
-                author: {
-                    name: "Cody Fisher",
-                    avatar: "img/profile_img/Rectangle 18-2.png"
-                },
-                stats: {
-                    likes: 501,
-                    views: 1249
-                },
-                category: "fotografia"
-            },
-            {
-                id: 7,
-                title: "Planeta",
-                image: "img/Rectangle 4-6.png",
-                author: {
-                    name: "Savannah Nguyen",
-                    avatar: "img/avatar-camila.avif"
-                },
-                stats: {
-                    likes: 482,
-                    views: 4713
-                },
-                category: "arte-digital"
-            },
-            {
-                id: 8,
-                title: "Rostros",
-                image: "img/Rectangle 4-7.png",
-                author: {
-                    name: "Brooklyn Simmons",
-                    avatar: "img/profile_img/photo.png"
-                },
-                stats: {
-                    likes: 392,
-                    views: 2834
-                },
-                category: "ilustracion"
-            },
-            {
-                id: 9,
-                title: "Jardín de cristal",
-                image: "img/Rectangle 4-8.png",
-                author: {
-                    name: "Devon Lane",
-                    avatar: "img/profile_img/photo-1.png"
-                },
-                stats: {
-                    likes: 627,
-                    views: 3456
-                },
-                category: "diseno-grafico"
-            },
-            {
-                id: 10,
-                title: "Montañas etéreas",
-                image: "img/Rectangle 4-9.png",
-                author: {
-                    name: "Courtney Henry",
-                    avatar: "img/profile_img/photo-2.png"
-                },
-                stats: {
-                    likes: 745,
-                    views: 5821
-                },
-                category: "fotografia"
-            },
-            {
-                id: 11,
-                title: "Geometría urbana",
-                image: "img/Rectangle 4-10.png",
-                author: {
-                    name: "Jerome Bell",
-                    avatar: "img/profile_img/Rectangle 18.png"
-                },
-                stats: {
-                    likes: 298,
-                    views: 2147
-                },
-                category: "diseno-grafico"
-            },
-            {
-                id: 12,
-                title: "Océano de luz",
-                image: "img/Rectangle 4-11.png",
-                author: {
-                    name: "Theresa Webb",
-                    avatar: "img/profile_img/Rectangle 18-1.png"
-                },
-                stats: {
-                    likes: 856,
-                    views: 6734
-                },
-                category: "arte-digital"
-            }
-        ];
-    }
+  /* === RENDER === */
+  renderGallery(designs = this.designs, limitCount = 8) {
+    const gridContainer = document.querySelector(".grid");
+    if (!gridContainer) return;
 
-    generateArtistData() {
-        return {
-            id: 1,
-            name: "Luna Evergreen",
-            avatar: "img/avatar-camila.avif",
-            bio: "Luna Evergreen es una artista digital visionaria renombrada por sus creaciones etéreas y encantadoras que transportan a los espectadores a reinos mágicos. Con un estilo distintivo que combina elementos fantásticos con técnicas digitales avanzadas, Luna ha ganado reconocimiento internacional por su capacidad de crear mundos imaginarios llenos de belleza y misterio.",
-            socialLinks: [
-                { type: "website", icon: "🌐", url: "#" },
-                { type: "instagram", icon: "📷", url: "#" },
-                { type: "twitter", icon: "✕", url: "#" }
-            ],
-            works: [
-                {
-                    id: 1,
-                    title: "Sinfonía celestial",
-                    image: "img/Rectangle 4-6.png",
-                    description: "Explora el cosmos a través de los paisajes celestiales de Luna, donde las estrellas danzan en armonía creando melodías visuales que resuenan en el alma. Esta obra representa la conexión entre la música del universo y la belleza visual."
-                },
-                {
-                    id: 2,
-                    title: "Criaturas mágicas",
-                    image: "img/Rectangle 4-8.png",
-                    description: "Encuentra seres míticos y criaturas fantásticas en los imaginativos diseños de Luna, donde cada personaje cuenta una historia única llena de magia y misterio. Estas criaturas habitan en mundos paralelos llenos de color y vida."
-                }
-            ]
-        };
-    }
+    const items = designs.slice(0, limitCount);
 
-    generateTestimonialsData() {
-        return [
-            {
-                id: 1,
-                name: "Jackson Chen",
-                avatar: "img/profile_img/photo.png",
-                testimonial: "He sido miembro de Publicloud durante más de un año y ha transformado completamente mi carrera como artista digital. La comunidad es increíblemente solidaria y las herramientas disponibles son de primera clase. No puedo imaginar crear arte sin esta plataforma."
-            },
-            {
-                id: 2,
-                name: "Sophia Lee",
-                avatar: "img/profile_img/photo-1.png",
-                testimonial: "Publicloud ha sido un recurso invaluable para mí como artista digital. Las conexiones que he hecho aquí han llevado a colaboraciones increíbles y mi trabajo ha alcanzado audiencias que nunca pensé posibles. Es más que una plataforma, es una familia creativa."
-            },
-            {
-                id: 3,
-                name: "Alex Kim",
-                avatar: "img/profile_img/photo-2.png",
-                testimonial: "La comunidad me ha impulsado a crear y compartir con confianza. Cada día encuentro nueva inspiración en el trabajo de otros artistas y recibo feedback constructivo que me ayuda a crecer. Publicloud ha sido fundamental en mi desarrollo artístico."
-            }
-        ];
-    }
+    gridContainer.innerHTML = items
+      .map(
+        (design) => `
+        <article class="card" data-id="${design.id}">
+          <img class="card__img" src="${design.fileURL || design.image}" alt="${design.title}" loading="lazy" />
+          <div class="card__meta">
+            <div class="user">
+              <img src="${design.authorPhotoURL}" alt="${design.authorDisplayName}" loading="lazy">
+              <span>${design.authorDisplayName}</span>
+            </div>
+            <div class="stats">
+              <span class="like-btn" data-id="${design.id}">❤ ${design.likes || design.stats?.likes || 0}</span>
+              <span>👁 ${design.views || design.stats?.views || 0}</span>
+            </div>
+          </div>
+        </article>
+      `
+      )
+      .join("");
+      this.markUserLikes();
+  }
 
-    generateLogosData() {
-        return [
-            { id: 1, name: "Creative Studios", image: "img/logos/1.png" },
-            { id: 2, name: "Digital Arts Academy", image: "img/logos/2.png" },
-            { id: 3, name: "Innovation Lab", image: "img/logos/3.png" },
-            { id: 4, name: "Design Masters", image: "img/logos/4.png" },
-        ];
-    }
+  /* === OTRAS SECCIONES === */
+  initSections() {
+    if (document.querySelector("#artistas .container")) this.renderArtistSection();
+    if (document.querySelector(".testimonials")) this.renderTestimonials();
+    if (document.querySelector(".logos")) this.renderLogos();
+    if (document.querySelector(".footer__grid")) this.renderFooter();
+  }
 
-    generateFooterData() {
-        return {
-            brand: {
-                logo: "img/logo.svg",
-                name: "Publicloud"
-            },
-            sections: [
-                {
-                    title: "Extras",
-                    links: [
-                        { text: "Consejos", url: "#" },
-                        { text: "Recursos", url: "#" },
-                        { text: "Compartir tu arte", url: "#" }
-                    ]
-                },
-                {
-                    title: "Nosotros",
-                    links: [
-                        { text: "Publicloud", url: "#" },
-                        { text: "Privacidad", url: "#" },
-                        { text: "Términos y condiciones", url: "#" },
-                        { text: "Preguntas frecuentes", url: "#" }
-                    ]
-                },
-                {
-                    title: "Redes Sociales",
-                    links: [
-                        { text: "Twitter", url: "#" },
-                        { text: "Instagram", url: "#" },
-                        { text: "Facebook", url: "#" },
-                        { text: "YouTube", url: "#" }
-                    ]
-                }
-            ]
-        };
-    }
+  async renderArtistSection() {
+    const artistSection = document.querySelector("#artistas .container");
+    if (!artistSection) return;
 
-    init() {
-        // Solo renderizar las secciones que existen en la página actual
-        if (document.querySelector('.grid')) {
-            this.renderGallery();
-        }
-        if (document.querySelector('#artistas .container')) {
-            this.renderArtistSection();
-        }
-        if (document.querySelector('.testimonials')) {
-            this.renderTestimonials();
-        }
-        if (document.querySelector('.logos')) {
-            this.renderLogos();
-        }
-        if (document.querySelector('.footer__grid')) {
-            this.renderFooter();
-        }
-        this.attachEventListeners();
-    }
+    try {
+      // Obtener todos los artistas
+      const usersSnap = await getDocs(collection(db, "users"));
 
-    renderGallery(designs = this.designs, limit = 8) {
-        const gridContainer = document.querySelector('.grid');
-        if (!gridContainer) return;
+      if (usersSnap.empty) {
+        artistSection.innerHTML = `
+          <h2 class="section__title">ARTISTAS</h2>
+          <p>No hay artistas registrados aún.</p>
+        `;
+        return;
+      }
 
-        const designsToShow = designs.slice(0, limit);
-        
-        gridContainer.innerHTML = designsToShow.map(design => `
-            <article class="card" data-id="${design.id}">
-                <img class="card__img" src="${design.image}" alt="${design.title}" loading="lazy" />
-                <div class="card__meta">
-                    <div class="user">
-                        <img src="${design.author.avatar}" alt="${design.author.name}" loading="lazy">
-                        <span>${design.author.name}</span>
-                    </div>
-                    <div class="stats">
-                        <span class="like-btn" data-id="${design.id}">❤ ${design.stats.likes}</span>
-                        <span>👁 ${design.stats.views}</span>
-                    </div>
-                </div>
-            </article>
-        `).join('');
-    }
+      // Filtrar al usuario actual
+      const allUsers = usersSnap.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }))
+        .filter((user) => user.id !== this.currentUser?.uid);
 
-    renderArtistSection() {
-        const artistSection = document.querySelector('#artistas .container');
-        if (!artistSection) return;
+      // Limitar a máximo 3 artistas distintos
+      const selectedArtists = allUsers.slice(0, 3);
 
-        const artistData = this.generateArtistData();
-        
-        const newContent = `
-            <h2 class="section__title">ARTISTAS</h2>
+      // Para cada artista, obtener sus diseños (máximo 2)
+      const artistData = await Promise.all(
+        selectedArtists.map(async (user) => {
+          const designsQuery = query(
+            collection(db, "designs"),
+            where("authorId", "==", user.id),
+            orderBy("createdAt", "desc"),
+            limit(2)
+          );
 
+          const designSnap = await getDocs(designsQuery);
+          user.designs = designSnap.docs.map((d) => ({
+            id: d.id,
+            ...d.data(),
+          }));
+
+          return user;
+        })
+      );
+
+      // === Renderizar HTML ===
+      artistSection.innerHTML = `
+        <h2 class="section__title">ARTISTAS</h2>
+        ${artistData
+          .map(
+            (artist) => `
             <article class="artist">
-                <img class="artist__avatar" src="${artistData.avatar}" alt="${artistData.name}" />
-                <div class="artist__info">
-                    <h3>${artistData.name}</h3>
-                    <p>${artistData.bio}</p>
-                    <div class="artist__links">
-                        ${artistData.socialLinks.map(link => `
-                            <a href="${link.url}" aria-label="${link.type}">${link.icon}</a>
-                        `).join('')}
-                    </div>
-                </div>
+              <img class="artist__avatar" src="${artist.photoURL || "img/avatar-default.png"}" alt="${artist.name}" />
+              <div class="artist__info">
+                <h3>${artist.name}</h3>
+                <p>${artist.bio || "Este artista aún no ha agregado una descripción."}</p>
+              </div>
             </article>
-
             <div class="artist__works">
-                ${artistData.works.map(work => `
-                    <figure class="work">
-                        <img src="${work.image}" alt="${work.title}" />
-                        <figcaption>
-                            <h4>${work.title}</h4>
-                            <p>${work.description}</p>
-                        </figcaption>
-                    </figure>
-                `).join('')}
+              ${
+                artist.designs.length > 0
+                  ? artist.designs
+                      .map(
+                        (work) => `
+                <figure class="work" onclick="window.location.href='design.html?id=${work.id}'" style="cursor:pointer;">
+                  <img src="${work.fileURL}" alt="${work.title}" />
+                  <figcaption>
+                    <h4>${work.title}</h4>
+                    <p>${work.description || "Sin descripción"}</p>
+                  </figcaption>
+                </figure>`
+                      )
+                      .join("")
+                  : `<p class="muted">Aún no ha subido diseños.</p>`
+              }
             </div>
+          `
+          )
+          .join("")}
+      `;
+    } catch (error) {
+      console.error("Error al cargar artistas:", error);
+      artistSection.innerHTML = `
+        <h2 class="section__title">ARTISTAS</h2>
+        <p>Error al cargar los artistas.</p>
+      `;
+    }
+  }
 
-            <div class="dots" aria-label="paginación">
-                <span class="dot dot--active"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-            </div>
-        `;
-        artistSection.innerHTML = newContent;
+  async renderTestimonials() {
+  const container = document.querySelector(".testimonials");
+  const section = document.querySelector(".testimonials-actions") || document.querySelector(".container");
+  if (!container || !section) return;
+
+  try {
+    // === 1️⃣ Cargar testimonios desde Firebase ===
+    const q = query(collection(db, "testimonials"), orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+    const testimonials = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+    // === 2️⃣ Renderizar testimonios existentes ===
+    container.innerHTML = testimonials
+      .map(
+        (t) => `
+        <article class="testimonial">
+          <img src="${t.photoURL || 'img/avatar-default.png'}" alt="${t.authorName}" />
+          <div>
+            <h4>${t.authorName}</h4>
+            <p>${t.text}</p>
+          </div>
+        </article>
+      `
+      )
+      .join("");
+
+    // === 3️⃣ Crear botón (si no existe aún) ===
+    let addBtn = document.querySelector(".add-testimonial-btn");
+    if (addBtn) {
+      addBtn.addEventListener("click", () => {
+        console.log("🟢 Botón 'Agregar testimonio' presionado");
+        this.openTestimonialModal();
+      });
     }
 
-    renderTestimonials() {
-        const testimonialsContainer = document.querySelector('.testimonials');
-        if (!testimonialsContainer) return;
-
-        const testimonials = this.generateTestimonialsData();
-        
-        testimonialsContainer.innerHTML = testimonials.map(testimonial => `
-            <article class="testimonial">
-                <img src="${testimonial.avatar}" alt="${testimonial.name}" />
-                <div>
-                    <h4>${testimonial.name}</h4>
-                    <p>${testimonial.testimonial}</p>
-                </div>
-            </article>
-        `).join('');
-    }
-
-    renderLogos() {
-        const logosContainer = document.querySelector('.logos');
-        if (!logosContainer) return;
-
-        const logos = this.generateLogosData();
-        
-        logosContainer.innerHTML = logos.map(logo => `
-            <img src="${logo.image}" alt="${logo.name}">
-        `).join('');
-    }
-
-    renderFooter() {
-        const footerGrid = document.querySelector('.footer__grid');
-        if (!footerGrid) return;
-
-        const footerData = this.generateFooterData();
-        
-        footerGrid.innerHTML = `
-            <div class="footer__brand">
-                <img src="${footerData.brand.logo}" alt="${footerData.brand.name}">
-                <p>${footerData.brand.name}</p>
-            </div>
-
-            ${footerData.sections.map(section => `
-                <div class="footer__col">
-                    <h5>${section.title}</h5>
-                    ${section.links.map(link => `
-                        <a href="${link.url}">${link.text}</a>
-                    `).join('')}
-                </div>
-            `).join('')}
-        `;
-    }
-
-    attachEventListeners() {
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('like-btn')) {
-                this.toggleLike(parseInt(e.target.dataset.id));
-            }
-            
-            if (e.target.closest('.card')) {
-                const card = e.target.closest('.card');
-                const designId = parseInt(card.dataset.id);
-                this.viewDesign(designId);
-            }
-        });
-
-        const verMasBtn = document.querySelector('.cta-row .btn--primary');
-        if (verMasBtn) {
-            verMasBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.loadMoreDesigns();
-            });
-        }
-
-        const subirBtn = document.querySelector('.cta-row .btn--ghost');
-        if (subirBtn) {
-            subirBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const currentUser = JSON.parse(localStorage.getItem('publicloud_current_user'));
-                if (currentUser) {
-                    window.location.href = 'upload.html';
-                } else {
-                    window.location.href = 'login.html';
-                }
-            });
-        }
-    }
-
-    toggleLike(designId) {
-        const design = this.designs.find(d => d.id === designId);
-        if (design) {
-            design.stats.likes += 1;
-            this.renderGallery();
-            
-            if (window.NotificationManager) {
-                window.NotificationManager.show('¡Te gusta este diseño!', 'success', 2000);
-            }
-        }
-    }
-
-    viewDesign(designId) {
-        const design = this.designs.find(d => d.id === designId);
-        if (design) {
-            design.stats.views += 1;
-            console.log(`Viewing design: ${design.title} by ${design.author.name}`);
-        }
-    }
-
-    loadMoreDesigns() {
-        const currentCount = document.querySelectorAll('.card').length;
-        this.renderGallery(this.designs, currentCount + 4);
-        
-        if (window.NotificationManager) {
-            window.NotificationManager.show('Más diseños cargados', 'info', 2000);
-        }
-    }
-
-    filterByCategory(category) {
-        if (category === 'all') {
-            this.renderGallery();
-        } else {
-            const filtered = this.designs.filter(design => design.category === category);
-            this.renderGallery(filtered);
-        }
-    }
-
-    searchDesigns(query) {
-        const filtered = this.designs.filter(design => 
-            design.title.toLowerCase().includes(query.toLowerCase()) ||
-            design.author.name.toLowerCase().includes(query.toLowerCase())
-        );
-        this.renderGallery(filtered);
-    }
-
-    getDesigns() {
-        return this.designs;
-    }
-
-    addDesign(newDesign) {
-        const design = {
-            id: Date.now(),
-            ...newDesign,
-            stats: {
-                likes: 0,
-                views: 0
-            }
-        };
-        this.designs.unshift(design);
-        this.renderGallery();
-        return design;
-    }
-
-    refreshGallery() {
-        this.userDesigns = JSON.parse(localStorage.getItem('publicloud_public_designs')) || [];
-        this.designs = [...this.userDesigns, ...this.mockDesigns];
-        this.renderGallery();
-    }
-
-    // Métodos que simulan llamadas a endpoints
-    async fetchDesigns() {
-        // Simula una llamada a API
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(this.generateMockData());
-            }, 500);
-        });
-    }
-
-    async fetchArtistData() {
-        // Simula una llamada a API
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(this.generateArtistData());
-            }, 300);
-        });
-    }
-
-    async fetchTestimonials() {
-        // Simula una llamada a API
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(this.generateTestimonialsData());
-            }, 200);
-        });
-    }
-
-    async fetchLogos() {
-        // Simula una llamada a API
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(this.generateLogosData());
-            }, 100);
-        });
-    }
-
-    async fetchFooterData() {
-        // Simula una llamada a API
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(this.generateFooterData());
-            }, 150);
-        });
-    }
-
-    // Métodos para recargar secciones individualmente
-    async reloadGallery() {
-        const designs = await this.fetchDesigns();
-        this.mockDesigns = designs;
-        this.designs = [...this.userDesigns, ...this.mockDesigns];
-        this.renderGallery();
-    }
-
-    async reloadArtistSection() {
-        const artistData = await this.fetchArtistData();
-        this.renderArtistSection();
-    }
-
-    async reloadTestimonials() {
-        const testimonials = await this.fetchTestimonials();
-        this.renderTestimonials();
-    }
-
-    async reloadLogos() {
-        const logos = await this.fetchLogos();
-        this.renderLogos();
-    }
-
-    async reloadFooter() {
-        const footerData = await this.fetchFooterData();
-        this.renderFooter();
-    }
-
-    // Método para recargar todo el contenido
-    async reloadAllData() {
-        await Promise.all([
-            this.reloadGallery(),
-            this.reloadArtistSection(),
-            this.reloadTestimonials(),
-            this.reloadLogos(),
-            this.reloadFooter()
-        ]);
-    }
+    // === 4️⃣ Escuchar clic del botón (y log de depuración) ===
+    addBtn.addEventListener("click", () => {
+      console.log("🟢 Botón 'Agregar testimonio' presionado");
+      this.openTestimonialModal();
+    });
+  } catch (error) {
+    console.error("Error al cargar testimonios:", error);
+    container.innerHTML = `<p>Error al cargar testimonios.</p>`;
+  }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Crear instancia global del manager de datos
-    window.dataManager = new GalleryManager();
-    
-    // Solo inicializar galería si existe el contenedor
-    if (document.querySelector('.grid')) {
-        window.galleryManager = window.dataManager;
+  openTestimonialModal() {
+    if (!this.currentUser) {
+      alert("Debes iniciar sesión para dejar un testimonio.");
+      return;
     }
-});
+
+    document.querySelectorAll('.testimonial-modal').forEach(m => m.remove());
+
+    // Crear modal específico
+    const modal = document.createElement("div");
+    modal.className = "testimonial-modal show";
+    modal.innerHTML = `
+      <div class="testimonial-modal__content">
+        <h2 class="testimonial-modal__title">Nuevo testimonio</h2>
+        <form id="testimonialForm" class="testimonial-modal__form">
+          <label for="testimonialText">Tu comentario</label>
+          <textarea id="testimonialText" rows="4" placeholder="Comparte tu experiencia..." required></textarea>
+          <div class="testimonial-modal__actions">
+            <button type="submit" class="btn btn--primary publish-btn">Publicar</button>
+            <button type="button" class="btn btn--ghost cancel-btn">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    //  Añadir listeners después de insertar el modal en el DOM
+    const cancelBtn = modal.querySelector(".cancel-btn");
+    const form = modal.querySelector("#testimonialForm");
+
+    // Cerrar el modal
+    cancelBtn.addEventListener("click", () => {
+      modal.remove();
+    });
+
+    // Manejar el envío del formulario
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = modal.querySelector("#testimonialText").value.trim();
+
+      if (!text) {
+        alert("Por favor escribe un comentario antes de publicar.");
+        return;
+      }
+
+      try {
+
+        await addDoc(collection(db, "testimonials"), {
+          authorId: this.currentUser.uid,
+          authorName: this.currentUser.displayName || this.currentUser.email,
+          photoURL: this.currentUser.photoURL || "img/avatar-default.png",
+          text,
+          createdAt: serverTimestamp(),
+        });
+
+        alert("✅ Testimonio agregado correctamente");
+        modal.remove();
+
+        // Recargar lista de testimonios
+        await this.renderTestimonials();
+      } catch (error) {
+        console.error("Error al agregar testimonio:", error);
+        alert("❌ No se pudo publicar el testimonio.");
+      }
+    });
+  }
+
+
+  renderLogos() {
+    const logosContainer = document.querySelector(".logos");
+    if (!logosContainer) return;
+    const logos = this.generateLogosData();
+    logosContainer.innerHTML = logos.map((logo) => `<img src="${logo.image}" alt="${logo.name}">`).join("");
+  }
+
+  renderFooter() {
+    const footerGrid = document.querySelector(".footer__grid");
+    if (!footerGrid) return;
+    const footerData = this.generateFooterData();
+    footerGrid.innerHTML = `
+      <div class="footer__brand">
+        <img src="${footerData.brand.logo}" alt="${footerData.brand.name}">
+        <p>${footerData.brand.name}</p>
+      </div>
+      ${footerData.sections
+        .map(
+          (section) => `
+        <div class="footer__col">
+          <h5>${section.title}</h5>
+          ${section.links.map((link) => `<a href="${link.url}">${link.text}</a>`).join("")}
+        </div>
+      `
+        )
+        .join("")}
+    `;
+  }
+
+  /* === INTERACCIÓN === */
+  attachEventListeners() {
+    document.addEventListener("click", (e) => {
+      // --- Clic en botón de "like" ---
+      if (e.target.classList.contains("like-btn")) {
+        e.stopPropagation(); // ❌ evita que el clic llegue al card
+        this.toggleLike(e.target.dataset.id);
+        return; // termina el flujo aquí
+      }
+
+      // --- Clic en la tarjeta (card) ---
+      const card = e.target.closest(".card");
+      if (card && !e.target.classList.contains("like-btn")) {
+        const designId = card.dataset.id;
+        this.viewDesign(designId);
+      }
+    });
+
+    // --- Clic en "Ver más" ---
+    const verMasBtn = document.querySelector(".cta-row .btn--primary");
+    if (verMasBtn) {
+      verMasBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        this.loadMoreDesigns();
+      });
+    }
+  }
+
+  async toggleLike(designId) {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        alert("Inicia sesión para dar like a un diseño ❤️");
+        return;
+      }
+
+      const currentUserId = user.uid;
+      const likeRef = doc(db, "designs", designId, "likes", currentUserId);
+      const designRef = doc(db, "designs", designId);
+
+      const likeSnap = await getDoc(likeRef);
+      const hasLiked = likeSnap.exists();
+
+      const btn = document.querySelector(`.like-btn[data-id='${designId}']`);
+      const likesLabel = btn?.textContent.match(/\d+/)
+        ? parseInt(btn.textContent.match(/\d+/)[0])
+        : 0;
+
+      if (!hasLiked) {
+        // === DAR LIKE ===
+        await Promise.all([
+          setDoc(likeRef, { likedAt: new Date() }),
+          updateDoc(designRef, { likes: increment(1) }),
+        ]);
+
+        if (btn) {
+          btn.classList.add("liked");
+          btn.textContent = `❤ ${likesLabel + 1}`;
+        }
+
+        console.log(`✅ Like agregado al diseño ${designId}`);
+      } else {
+        // === QUITAR LIKE ===
+        await Promise.all([
+          deleteDoc(likeRef),
+          updateDoc(designRef, { likes: increment(-1) }),
+        ]);
+
+        if (btn) {
+          btn.classList.remove("liked");
+          btn.textContent = `❤ ${Math.max(0, likesLabel - 1)}`;
+        }
+
+        console.log(`💔 Like removido del diseño ${designId}`);
+      }
+    } catch (error) {
+      console.error("Error al dar like:", error);
+    }
+  }
+
+  async markUserLikes() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    try {
+      const userId = user.uid;
+      const designsRef = collection(db, "designs");
+      const snapshot = await getDocs(designsRef);
+
+      for (const docSnap of snapshot.docs) {
+        const designId = docSnap.id;
+        const likeRef = doc(db, "designs", designId, "likes", userId);
+        const likeSnap = await getDoc(likeRef);
+
+        if (likeSnap.exists()) {
+          const btn = document.querySelector(`.like-btn[data-id='${designId}']`);
+          if (btn) btn.classList.add("liked");
+        }
+      }
+    } catch (error) {
+      console.error("Error al marcar likes del usuario:", error);
+    }
+  }
+
+  viewDesign(id) {
+    window.location.href = `design.html?id=${encodeURIComponent(id)}`;
+  }
+
+  loadMoreDesigns() {
+    const current = document.querySelectorAll(".card").length;
+    this.renderGallery(this.designs, current + 4);
+  }
+
+  /* === DATOS MOCK (aún no en Firebase) === */
+  generateMockData() {
+    return [
+      {
+        id: 1,
+        title: "Bosque mágico",
+        image: "img/Rectangle 4.png",
+        author: { name: "Dianne Russell", avatar: "img/profile_img/photo.png" },
+        stats: { likes: 850, views: 4902 },
+        category: "ilustracion",
+      },
+      {
+        id: 2,
+        title: "Cubismo",
+        image: "img/Rectangle 4-1.png",
+        author: { name: "Arlene McCoy", avatar: "img/profile_img/photo-1.png" },
+        stats: { likes: 583, views: 4023 },
+        category: "arte-digital",
+      },
+    ];
+  }
+
+  generateArtistData() {
+    return {
+      name: "Luna Evergreen",
+      avatar: "img/avatar-camila.avif",
+      bio: "Luna Evergreen es una artista digital visionaria...",
+      socialLinks: [
+        { type: "website", icon: "🌐", url: "#" },
+        { type: "instagram", icon: "📷", url: "#" },
+        { type: "twitter", icon: "✕", url: "#" },
+      ],
+      works: [
+        { title: "Sinfonía celestial", image: "img/Rectangle 4-6.png", description: "Explora el cosmos..." },
+        { title: "Criaturas mágicas", image: "img/Rectangle 4-8.png", description: "Encuentra seres míticos..." },
+      ],
+    };
+  }
+
+  generateTestimonialsData() {
+    return [
+      { name: "Jackson Chen", avatar: "img/profile_img/photo.png", testimonial: "He sido miembro de Publicloud..." },
+      { name: "Sophia Lee", avatar: "img/profile_img/photo-1.png", testimonial: "Publicloud ha sido un recurso..." },
+    ];
+  }
+
+  generateLogosData() {
+    return [
+      { name: "Creative Studios", image: "img/logos/1.png" },
+      { name: "Digital Arts Academy", image: "img/logos/2.png" },
+      { name: "Innovation Lab", image: "img/logos/3.png" },
+      { name: "Design Masters", image: "img/logos/4.png" },
+    ];
+  }
+
+  generateFooterData() {
+    return {
+      brand: { logo: "img/logo.svg", name: "Publicloud" },
+      sections: [
+        {
+          title: "Extras",
+          links: [
+            { text: "Consejos", url: "#" },
+            { text: "Recursos", url: "#" },
+            { text: "Compartir tu arte", url: "#" },
+          ],
+        },
+        {
+          title: "Nosotros",
+          links: [
+            { text: "Publicloud", url: "#" },
+            { text: "Privacidad", url: "#" },
+            { text: "Términos y condiciones", url: "#" },
+            { text: "Preguntas frecuentes", url: "#" },
+          ],
+        },
+        {
+          title: "Redes Sociales",
+          links: [
+            { text: "Twitter", url: "#" },
+            { text: "Instagram", url: "#" },
+            { text: "Facebook", url: "#" },
+            { text: "YouTube", url: "#" },
+          ],
+        },
+      ],
+    };
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => new GalleryManager());

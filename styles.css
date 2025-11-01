@@ -38,8 +38,8 @@ img{display:block;max-width:100%;height:auto;border-radius:16px}
 .brand__name{font-weight:700}
 
 .nav{display:flex;gap:28px}
-.nav__link{color:var(--ink);text-decoration:none;border-bottom:2px dotted var(--primary-2);padding-bottom:2px}
-.nav__link:hover{opacity:.8}
+.nav__link{color:var(--ink);text-decoration:none;border-bottom:2px  var(--primary-2);padding-bottom:2px}
+.nav__link:hover{opacity:.5; border-bottom:2px  var(--primary-2) solid}
 
 .profile{
   display:flex;align-items:center;gap:.6rem;
@@ -153,6 +153,12 @@ img{display:block;max-width:100%;height:auto;border-radius:16px}
 }
 .testimonial img{width:150px;height:150px;object-fit:cover;border-radius:14px}
 
+.testimonials-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
 /* Logos */
 .section--logos{padding-top:20px}
 .logos{
@@ -250,7 +256,7 @@ img{display:block;max-width:100%;height:auto;border-radius:16px}
 .side-nav{display:flex;flex-direction:column;gap:12px;margin-top:10px}
 .side-link{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;text-decoration:none;color:var(--ink);background:#f5fbfe;border:1px solid #cae7f3}
 .side-link:hover{filter:brightness(1.05)}
-.side-link.active{background:#e4f3f9}
+.side-link.active{background:#dbf1f9}
 .side-fab{width:44px;height:44px;border-radius:999px;border:2px dashed #c7e3f0;background:#fff;cursor:pointer}
 
 /* Main area */
@@ -329,14 +335,14 @@ img{display:block;max-width:100%;height:auto;border-radius:16px}
 .cover--small{height:120px}
 
 .upload-wrap{
-  max-width:1100px;margin:-60px auto 40px;padding:0 20px;
+  max-width:1100px;margin:40px auto;padding:0 20px;
 }
 
 .upload-card{
   background:#fff;border:1px solid #d6e8f0;border-radius:22px;box-shadow:var(--shadow);
   padding:22px;
 }
-
+.header-actions
 .upload-title{
   margin:0 0 16px;font-size:28px;font-weight:800;color:var(--primary);
 }
@@ -598,3 +604,616 @@ img{display:block;max-width:100%;height:auto;border-radius:16px}
   background:#e6f3ff;
   color:var(--primary);
 }
+
+
+
+/* === MODAL DE EDICIÓN DE PERFIL === */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.modal.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 420px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+  transform: translateY(-20px);
+  transition: transform 0.25s ease;
+}
+
+.modal.show .modal-content {
+  transform: translateY(0);
+}
+
+.modal-content h2 {
+  margin-bottom: 1rem;
+  font-size: 1.4rem;
+  text-align: center;
+}
+
+.modal-content label {
+  display: block;
+  margin-top: 0.8rem;
+  font-weight: 500;
+}
+
+.modal-content input[type="text"],
+.modal-content input[type="file"] {
+  width: 100%;
+  margin-top: 0.3rem;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+}
+
+.modal-content textarea {
+  width: 100%;
+  margin-top: 0.3rem;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  resize: none; /* Permite agrandarlo solo hacia abajo */
+  box-sizing: border-box; /* Evita que el padding cause overflow */
+  min-height: 80px; /* Altura mínima razonable */
+}
+
+
+/* === SISTEMA DE TABS === */
+.tabs {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.tabs-bar {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+.tabs-bar label {
+  cursor: pointer;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  color: #555;
+  transition: all 0.2s ease;
+}
+
+.tabs-bar label:hover {
+  color: #111;
+  background-color: #f4f4f4;
+}
+
+/* Inputs ocultos */
+.tabs input[type="radio"] {
+  display: none;
+}
+
+/* Ocultar todo el contenido por defecto */
+.tab-content .tab-pane {
+  display: none;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Mostrar la pestaña activa */
+#tab-designs:checked ~ .tab-content .tab-pane:nth-of-type(1),
+#tab-stats:checked ~ .tab-content .tab-pane:nth-of-type(2) {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Resaltar pestaña activa */
+#tab-designs:checked ~ .tabs-bar label[for="tab-designs"],
+#tab-stats:checked ~ .tabs-bar label[for="tab-stats"] {
+  color: #000;
+  background-color: #e8e8e8;
+}
+
+/* === GRID DE DISEÑOS === */
+.design-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem 0;
+  width: 100%;
+}
+
+/* === TARJETA DE DISEÑO === */
+.design-card {
+  background-color: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+}
+
+.design-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Imagen */
+.design-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  background-color: #f5f5f5;
+  display: block;
+}
+
+/* Información */
+.design-info {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.design-info h3 {
+  font-size: 1rem;
+  color: #222;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+
+.design-info p {
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.4;
+}
+
+/* Metadatos */
+.design-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #777;
+  margin-top: 0.6rem;
+}
+
+.design-category {
+  background-color: #f1f1f1;
+  border-radius: 6px;
+  padding: 0.2rem 0.6rem;
+  font-weight: 500;
+  color: #444;
+}
+
+.design-likes {
+  color: #e63946;
+  font-weight: 600;
+}
+
+/* Estado vacío */
+.empty-state {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: #777;
+  font-size: 0.95rem;
+}
+
+.empty-state p {
+  margin-bottom: 1rem;
+}
+
+.empty-state .btn--primary {
+  background-color: #111;
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.empty-state .btn--primary:hover {
+  background-color: #333;
+}
+upload-wrap
+.design-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  padding: 0.5rem 0.8rem 1rem;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.btn-icon:hover {
+  transform: scale(1.2);
+}
+
+
+/* === SECCIÓN DE ARTISTAS === */
+.artist {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.artist__avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  margin: 0 auto;
+}
+
+.artist__info {
+  flex: 1;
+  min-width: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.artist__info h3 {
+  margin-bottom: 0.3rem;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.artist__info p {
+  color: #555;
+  line-height: 1.4;
+}
+
+/* === GALERÍA DE OBRAS === */
+.artist__works {
+  display: flex;
+  justify-content: center; /* 👈 centra horizontalmente */
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  text-align: center;
+   margin-bottom: 2rem;
+}
+
+.work {
+  width: 350px;
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.work:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.work img {
+  width: 100%;
+  height: 225px;
+  object-fit: cover;
+  display: block;
+}
+
+.work figcaption {
+  padding: 0.8rem 1rem;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.work figcaption h4 {
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+  color: #222;
+}
+
+.work figcaption p {
+  color: #666;
+  line-height: 1.4;
+  font-size: 0.85rem;
+}
+
+
+/* === MODAL DE TESTIMONIOS === */
+.testimonial-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.testimonial-modal.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.testimonial-modal__content {
+  background: #fff;
+  border-radius: 14px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 420px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  animation: testimonial-modal-in 0.25s ease;
+}
+
+@keyframes testimonial-modal-in {
+  from {
+    transform: translateY(-15px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.testimonial-modal__title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.testimonial-modal__form label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.3rem;
+}
+
+.testimonial-modal__form textarea {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0.8rem;
+  font-size: 0.95rem;
+  resize: none;
+  margin-bottom: 1rem;
+}
+
+.testimonial-modal__actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
+
+
+.design-page {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.design-detail {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  max-width: 1100px;
+}
+
+/* Perfil lateral */
+.artist-profile {
+  flex: 0 0 260px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  padding: 1.5rem;
+}
+
+.artist-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 0.8rem;
+  margin: auto;
+}
+
+.artist-profile h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.3rem;
+}
+
+.artist-profile p {
+  color: #555;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.artist-stats {
+  display: flex;
+  justify-content: space-around;
+  font-size: 0.85rem;
+  margin: 1rem 0;
+}
+
+.artist-stats span:first-child {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.artist-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Contenido principal */
+.design-content {
+  flex: 1;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+}
+
+.design-content h1 {
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+}
+
+.design-actions-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1rem 0;
+}
+
+.design-metrics span {
+  margin-right: 1rem;
+  color: #444;
+}
+
+.design-images img {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.related-works h2 {
+  margin-bottom: 1rem;
+}
+
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.related-card {
+  cursor: pointer;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f9fafc;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.related-card:hover {
+  transform: translateY(-4px);
+}
+
+.related-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+}
+
+.related-card h4 {
+  padding: 0.5rem 1rem 1rem;
+  font-size: 0.95rem;
+  color: #222;
+}
+
+
+.like-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.05rem;
+  color: #444;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.like-btn:hover {
+  transform: scale(1.2);
+  color: #e63946;
+}
+
+.like-btn.liked {
+  color: #e63946;
+  transform: scale(1.3);
+}
+
+.btn--secondary {
+  background: #f5f6fa;
+  border: 1px solid #ccc;
+  color: #222;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn--secondary:hover {
+  background: #eaecef;
+  border-color: #bbb;
+}
+
+#likeArtistBtn.liked {
+  background: #e63946;
+  color: #fff;
+  border-color: transparent;
+  transform: scale(1.05);
+}
+
+
+
+#contactBtn {
+  border: 1px solid #ccc;
+  color: #333;
+  background-color: #f9f9f9;
+  transition: all 0.2s ease;
+}
+
+#contactBtn:hover {
+  background-color: #e6e6e6;
+  color: #111;
+}
+
+
+.work {
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.work:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+

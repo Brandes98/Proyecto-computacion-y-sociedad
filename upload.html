@@ -6,26 +6,26 @@
   <title>Subir diseño — Publicloud</title>
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="js/auth.js" defer></script>
-  <script src="js/upload.js" defer></script>
+  <script src="firebase-env.js"></script>
+  <script  type="module" src="js/firebase/config.js" defer></script>
+  <script type="module" src="js/auth.js" defer></script>
+  <script type="module" src="js/upload.js" defer></script>
 </head>
 <body class="dash-body">
 
-  <!-- Sidebar (igual a dashboard) -->
+  <!-- Sidebar -->
   <aside class="sidebar">
-    <a href="index.html" class="logo-mini" aria-label="Inicio">◇</a>
+    <a href="index.html" class="side-link" aria-label="Inicio">◇</a>
     <nav class="side-nav">
-      <a class="side-link" href="dashboard.html" title="Inicio">🏠</a>
-      <a class="side-link" href="#" title="Mis diseños">🗂</a>
+      <a class="side-link" href="profile.html" title="Perfil">👤</a>
       <a class="side-link" href="#" title="Mensajes">💬</a>
-      <a class="side-fab active" href="upload.html" title="Nuevo">＋</a>
+      <a class="side-link active" title="Nuevo" href="upload.html">➕</a>
       <a class="side-link" href="#" title="Ajustes">⚙️</a>
-      <a class="side-link logout-btn" href="#" title="Salir">👤</a>
+      <a class="side-link logout-btn" href="#" title="Salir">➜]</a>
     </nav>
   </aside>
 
   <main class="dash-main">
-    <header class="cover cover--small"></header>
 
     <section class="upload-wrap">
       <form class="upload-card" id="uploadForm">
